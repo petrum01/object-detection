@@ -104,17 +104,21 @@ For compatibility purposes (I prototype on Mac OS X, then train on the cloud), I
 
 #### Training
 
-1. start training for 1000 epochs
+1. Start training for 1000 epochs
 
 ```
 %cd /content/darkflow
 !./flow --model cfg/tiny-yolo-voc-1c.cfg --train --dataset "/content/darkflow/input" --annotation "/content/darkflow/PASCAL_VOC" --gpu 1 --epoch 1000 --save 100
 ```
 
-2. assess results
+2. Assess results
 
 Download the trained weights (in this case, checkpoint files), and run locally the net for inference on the test set.
 After the first 1000 epochs, the model seems to have converged (at least loss was consistently below 0.8). But, the model did not predict any image on the test set. When run on the *train* set, bounding boxes appeared only when the thershold was lowered to 0,1 (at 0,5, maybe half the bounding boxes were showing).
+
+3. Train for more epochs
+
+After 1500 epochs
 
 ##### To do:
     1.	overfit the network on a very small dataset (a few images) before training on the whole dataset (the overfitting loss can be around or smaller than 0.1 for a one class only network). In the case of disabling noise augmentation, it can very well be near perfect 0.0.
@@ -122,4 +126,8 @@ After the first 1000 epochs, the model seems to have converged (at least loss wa
 ##### Dataset
     1.	Need to have a better test set
     2.	other class to train with ? with more images for training and testing
-    3.	train with more classes 
+    3.	train with more classes
+
+## Part 3 : Running the trained net on a Raspberry Pi 3 for in-car inference
+
+The last part of the project is on‑device inference with low latency and a small model size and *hopefully* decent fps.
