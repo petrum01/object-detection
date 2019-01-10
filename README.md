@@ -1,23 +1,23 @@
-######Custom-class object detection
+###### Custom-class object detection
 
 Train a neural net for custom class object detection and run inference at the edge.
 
-###Contents
+### Contents
 
 
 
-###Summary
+### Summary
 
-This is a proposition for the EPFL Extension School Applied Machiune Learning program Capstone project.
+This is a proposition for the EPFL Extension School Applied Machine Learning program Capstone project.
 
 
-###Part 1 : building the data set
+### Part 1 : building the data set
 
-##Collecting data for Training
+## Collecting data for Training
 
 1.1.	Collecting images from Google Image Search
 
-I used this `repo on github <https://github.com/hardikvasa/google-images-download>` to collect images from the web.
+I used this [`repo on github`](https://github.com/hardikvasa/google-images-download) to collect images from the web.
 
 I chose a custom class of objects (for now, speed-traps), and searched for specific keywords and also reverse searched for specific images, using the code below :
 
@@ -65,22 +65,27 @@ To do :
 
 
 Collecting data for testing:
-----------------------------
+
 I attached a GoPro camera in my car and filmed my trips on Swiss highways. The footage captures many speedtraps. This will be used as a test set to evaluate the trained model acuracy.
 
     Example :
 ![](test_set_gif_example.gif)
 
 
-###Part 2 : Training the net
+### Part 2 : Training the net
 
-##Choosing the architecture
+## Choosing the architecture of the net
 
 For now, I chose to go with Single Shot Detector architectures, which are more likely to work on emnbedded devices to run inference at the edge (think Raspberry Pi 3 with limited computing power).
 
 Yolo : quick prototyping
 
-For compatibility purposes (I try to prototype on Mac OS X, then train on the cloud), I used this fork of Darknet YOLO `repo on github <https://github.com/thtrieu/darkflow>` which is a Tensorflow implementation of Darknet.
+For compatibility purposes (I prototype on Mac OS X, then train on the cloud), I used this [`fork of Darknet`](https://github.com/thtrieu/darkflow) which is a Tensorflow implementation of Darknet.
 
-To do
-implement a SD from scratch in Tensorflow
+
+# To do
+    1. try [`Tensorflow Object Detection API`](https://github.com/tensorflow/models/tree/master/research/object_detection)
+    2. consider implementing a SSD architecture from scratch in Tensorflow
+
+
+## Training a Model
