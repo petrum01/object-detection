@@ -1,4 +1,4 @@
-#nCustom-class object detection
+# Custom-class object detection
 
 Train a neural net for custom class object detection and run inference at the edge.
 
@@ -15,7 +15,7 @@ This is a proposition for the EPFL Extension School Applied Machine Learning pro
 
 ### Collecting data for Training
 
-1.1.	Collecting images from Google Image Search
+#### 1.1.	Collecting images from Google Image Search
 
 I used this [`repo on github`](https://github.com/hardikvasa/google-images-download) to collect images from the web.
 
@@ -56,7 +56,7 @@ if not os.path.isdir(imdir):
         n += 1
 ```
 
-To do :
+##### To do :
     1. add more images for one class to perfect training
         adapt the code above to retrieve more than 100 images per search (limit set by Google)
     2. add other classes of objects
@@ -81,7 +81,7 @@ Yolo : quick prototyping
 For compatibility purposes (I prototype on Mac OS X, then train on the cloud), I used this [`fork of Darknet`](https://github.com/thtrieu/darkflow) which is a Tensorflow implementation of Darknet.
 
 
-#### To do
+##### To do
     1. try [`Tensorflow Object Detection API`](https://github.com/tensorflow/models/tree/master/research/object_detection)
     2. consider implementing a SSD architecture from scratch in Tensorflow
 
