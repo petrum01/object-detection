@@ -4,7 +4,24 @@ Train a neural net for custom class object detection and run inference at the ed
 
 ## Contents
 
+<!-- TOC depthFrom:1 depthTo:4 withLinks:1 updateOnSave:1 orderedList:0 -->
 
+- [Custom-class object detection](#custom-class-object-detection)
+	- [Contents](#contents)
+	- [Summary](#summary)
+	- [Part 1 : building the data set](#part-1-building-the-data-set)
+		- [Collecting data for Training](#collecting-data-for-training)
+			- [1.1.	Collecting images from Google Image Search](#11-collecting-images-from-google-image-search)
+		- [Labelling and annotating train data](#labelling-and-annotating-train-data)
+		- [Collecting data for testing:](#collecting-data-for-testing)
+	- [Part 2 : Training the net](#part-2-training-the-net)
+		- [Choosing the architecture of the net](#choosing-the-architecture-of-the-net)
+		- [Training a Model using Google Colab GPU](#training-a-model-using-google-colab-gpu)
+			- [Setting up Google Colab](#setting-up-google-colab)
+			- [Training](#training)
+	- [Part 3 : Running the trained net on a Raspberry Pi 3 for in-car inference](#part-3-running-the-trained-net-on-a-raspberry-pi-3-for-in-car-inference)
+
+<!-- /TOC -->
 
 ## Summary
 
