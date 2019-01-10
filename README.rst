@@ -16,7 +16,8 @@ This is a proposition for the EPFL Extension School Applied Machiune Learning pr
 Part 1 : building the data set
 ==============================
 
-## Collecting data for Training
+Collecting data for Training
+----------------------------
 
 1.1.	Collecting images from Google Image Search
 
@@ -40,7 +41,7 @@ I chose a custom class of objects (for now, speed-traps), and searched for speci
     paths = response.download(arguments)   #passing the arguments to the function
     print(paths)   #printing absolute paths of the downloaded images
 
-Then renamed them:
+Then renamed them and placed them in an appropriate folder structure:
 
 .. code-block:: python
 
@@ -61,27 +62,19 @@ Then renamed them:
             n += 1
 
 
-
 To do :
-1. add more images for one class
-2. add other classes of objects
-3.
+    1. add more images for one class to perfect training
+        adapt the code above to retrieve more than 100 images per search (limit set by Google)
+    2. add other classes of objects
 
 
+Collecting data for testing:
+----------------------------
+I attached a GoPro camera in my car and filmed my trips on Swiss highways. The footage captures many speedtraps. This will be used as a test set to evaluate the trained model acuracy.
+
+    Example :
+![](test_set_gif_example.gif)
 
 
-1.	but only 150 imgs,
-2.	choose another class if needed
-3.	solve issue with limitations to 100 imgs
-
-
-
-
-## Training
-
-
-
-
-#### Part 2
-
-First portable device to improve users’ safety by using deep learning to do live object detection and reporting to center of management
+Part 2 : Training the net
+=========================
