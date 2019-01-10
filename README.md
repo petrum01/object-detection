@@ -61,12 +61,16 @@ if not os.path.isdir(imdir):
         adapt the code above to retrieve more than 100 images per search (limit set by Google)
     2. add other classes of objects
 
+### Labelling and annotating train data
+
+git clone https://github.com/Cartucho/OpenLabeling
+–	creat bounding boxes
+–	have outpu in xml format used by darkflow
 
 ### Collecting data for testing:
 
 I attached a GoPro camera in my car and filmed my trips on Swiss highways. The footage captures many speedtraps. This will be used as a test set to evaluate the trained model acuracy.
 
-    Example :
 ![](test_set_gif_example.gif)
 
 
@@ -82,8 +86,29 @@ For compatibility purposes (I prototype on Mac OS X, then train on the cloud), I
 
 
 ##### To do
-    1. try [`Tensorflow Object Detection API`](https://github.com/tensorflow/models/tree/master/research/object_detection)
+    1. try Tensorflow Object Detection API (https://github.com/tensorflow/models/tree/master/research/object_detection)
     2. consider implementing a SSD architecture from scratch in Tensorflow
 
 
-### Training a Model
+### Training a Model using Google Colab GPU
+
+#### Setting up Google Colab
+
+1. Requirements : numpy, cython, opencv, Darkflow
+2. using pre-trained weights : tiny-yolo-voc.weights
+3. Modify cfg file to match number of classes to be trained with, in my case 1 :
+    in the last layer : the number of classes should be changed from 80 to 1: classes=80 => classes=1
+    in the convolutional layer above (the second to last layer) to num * (classes + 5) (30 in this case)
+4. add a labels.text file with the labels of the classes to train with
+5. upload the dataset and the annotations
+
+#### Training
+
+1. start training for 1000 epochs
+
+```
+%cd /content/darkflow
+!./flow --model cfg/tiny-yolo-voc-1c.cfg --train --dataset "/content/darkflow/input" --annotation "/content/darkflow/PASCAL_VOC" --gpu 1 --epoch 1000 --save 100
+```
+
+2. assess results
