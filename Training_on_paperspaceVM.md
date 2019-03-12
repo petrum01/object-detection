@@ -248,7 +248,7 @@ loss:<1.50
 
 ![mAP](trainingFPN_map.png)
 ![loss](trainingFPN_loss.png)
-
+![inference](trainingFPN_inference)
 
 
 - training_PM_resnet
