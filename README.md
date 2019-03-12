@@ -2,19 +2,6 @@
 
 Train a neural net for custom class object detection and run inference at the edge.
 
-## To do
-	0. train / test set :
-		- divide unique objects between sets
-	0. base model (simple classification, w/o bounding boxes) : VGG16 in keras, retrain last layers
-    1. try Tensorflow Object Detection API (https://github.com/tensorflow/models/tree/master/research/object_detection)
-    2. consider implementing a SSD architecture from scratch in Tensorflow
-	3. Tensorflow Lite
-	4. novel SSD-based architecture called [`Pooling Pyramid Network (PPN)`](https://arxiv.org/abs/1807.03284) whose model size is >3x smaller than that of SSD MobileNet v1 with minimal loss in accuracy.
-	5. add another class (cars for instance, but w/ purpose : detectr speed dropping when passing radars...) :
-		- from already annotated images from COCO or other public data set
-	6. augment accuracy by telling the model where to look in the images
-	7. other : vignette detector
-
 
 ## Contents
 <!-- TOC depthFrom:1 depthTo:4 withLinks:1 updateOnSave:1 orderedList:0 -->
@@ -214,7 +201,6 @@ After several tries (1000 epochs to 8000 epochs), the model seems to have conver
 
 
 Please refer to Training on Paperspace.md
-
 
 
 ## Part 3 : Running the trained model on a mobile device for in-car inference
