@@ -159,6 +159,9 @@ batch_size = 48
 
 ![graph for mean average precision at 0.5 IOU (mAP@.50IOU)](training_PM_3_mAP.png)
 
+Inference on a test video :
+![](vid_inf_training_PM_3.gif)
+
 - training_PM_4 :
 12k steps
 batch_size = 48
@@ -171,6 +174,7 @@ loss 1.3
 
 ![](trainingPM4_GPU_load.gif)
 slower to train due to data augment options (it seems the data augmentation operations are done by CPU before each batch/step and then processed by GPU, many I/O)
+```
 data_augmentation_options {
   random_horizontal_flip {
   ssd_random_crop {
@@ -179,7 +183,7 @@ data_augmentation_options {
   random_adjust_hue {
   random_adjust_saturation {
   random_distort_color {
-
+```
 source : https://github.com/tensorflow/models/blob/master/research/object_detection/core/preprocessor.py
 
 - training_PM_5:
@@ -234,14 +238,16 @@ solution: added "from_detection_checkpoint: true" in config file
 and also duplicates logging
 solution : Open variables_helper.py in models/research/object_detection/utils/variables_helper.py and replace all occurrences of logging with tf.logging
 
-OK, trains Now
-loss is huge
+After a bit of tuning:
 
-trying batch_size : 8
-steps : 9196
+batch_size : 8
+after 9196 steps:
 mAP:0.70
 mAP 0.50 : 0.99
 loss:<1.50
+
+![mAP](trainingFPN_map.png)
+![loss](trainingFPN_loss.png)
 
 
 
