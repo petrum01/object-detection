@@ -2,6 +2,20 @@
 
 Train a neural net for custom class object detection and run inference at the edge.
 
+## To do
+	0. train / test set :
+		- divide unique objects between sets
+	0. base model (simple classification, w/o bounding boxes) : VGG16 in keras, retrain last layers
+    1. try Tensorflow Object Detection API (https://github.com/tensorflow/models/tree/master/research/object_detection)
+    2. consider implementing a SSD architecture from scratch in Tensorflow
+	3. Tensorflow Lite
+	4. novel SSD-based architecture called [`Pooling Pyramid Network (PPN)`](https://arxiv.org/abs/1807.03284) whose model size is >3x smaller than that of SSD MobileNet v1 with minimal loss in accuracy.
+	5. add another class (cars for instance, but w/ purpose : detectr speed dropping when passing radars...) :
+		- from already annotated images from COCO or other public data set
+	6. augment accuracy by telling the model where to look in the images
+	7. other : vignette detector
+
+
 ## Contents
 <!-- TOC depthFrom:1 depthTo:4 withLinks:1 updateOnSave:1 orderedList:0 -->
 
@@ -12,7 +26,7 @@ Train a neural net for custom class object detection and run inference at the ed
 		- [Collecting data for Training](#collecting-data-for-training)
 			- [Collecting images from Google Image Search](#collecting-images-from-google-image-search)
 			- [Collecting images from Google street view](#collecting-images-from-google-street-view)
-			- [Collecting images from live GoPro footage](#collecting-images-from-live-gopro-footage)
+			- [Collecting images from GoPro footage](#collecting-images-from-gopro-footage)
 		- [Labelling and annotating train data](#labelling-and-annotating-train-data)
 		- [Collecting data for testing:](#collecting-data-for-testing)
 	- [Part 2 : Training the net](#part-2-training-the-net)
@@ -36,7 +50,7 @@ I will thoroughly document each phase of the project and draw conclusions on the
 
 ### Collecting data for Training
 
-#### Collecting images from Google Image Search
+#### First try : Collecting images from Google Image Search
 
 I used this [`repo on github`](https://github.com/hardikvasa/google-images-download) to collect images from the web.
 
@@ -77,50 +91,82 @@ if not os.path.isdir(imdir):
         n += 1
 ```
 
-#### Collecting images from Google street view
+It resulted in a very limited dataset (about 100 images), not coherent enough :different types of speed traps, different POV.
 
 
-#### Collecting images from GoPro footage
+#### Second try : Collecting images from GoPro footage
 
-important to have a train dataset close to what the test set might be (how to say this ??)
+I attached a GoPro camera in my car and filmed my trips on Swiss highways. The footage captures many speedtraps. This will be used as a train / test set.
+
+![](test_set_gif_example.gif)
 
 Methodology for filming :
-- filming at 60 fps, 720p super wide mode, with GoPro Hero+
+- filming at 60 fps, with GoPro Hero+
 - camera mounted on the dashboard of the car
 - filming the same object with different lighting conditions, slightly different angles
 
-Post-processing in iMovie
-simple color grading
-
+Post-processing in iMovie:
+- simple color grading
 
 Extracting frames from video footage
 run $ python extract_frames.py
 
+The final train set consists of :
+- 400 images
+- one class of object (speedtrap)
 
-200 to 1000 images
-
+This dataset is derived from footage that, for each unique object, is filmed by a dash-mounted camera:
+- from right and left lane
+- from different camera position / angle
+- in the two ways
+- in at least two different lighting conditions
 
 Issues :
-how many frames to take ?
-what about the similiraty of frames that are close to each other ?
-point above has an impact on train / test set
+- what about the similiraty of frames that are close to each other ?
 
-- create a balanced dataset (with and without radar, repartition to match 'real' distribution in order to keep false positive ratio low)
-
-then, use keras image processing for data augmentation
-ImageDataGenerator for real-time data augmentation
 
 ### Labelling and annotating train data
 
-git clone https://github.com/Cartucho/OpenLabeling
-- create bounding boxes
-- generate output in xml format used by darkflow
+In RectLabel:
+- create bounding boxes for each image
+- generate annotation output in xml format
 
-### Collecting data for testing:
+Quick check of the output vs. the original images :
 
-I attached a GoPro camera in my car and filmed my trips on Swiss highways. The footage captures many speedtraps. This will be used as a test set to evaluate the trained model acuracy.
+```python
+import os
+annot_dir = '/Users/pm/Documents/AI/compvision/Object_detection/creating_dataset/GP020472_edit_close_annot'
+img_dir = '/Users/pm/Documents/AI/compvision/Object_detection/creating_dataset/GP020472_edit_close_img'
+filesA = [os.path.splitext(filename)[0] for filename in os.listdir(annot_dir)]
+filesB = [os.path.splitext(filename)[0] for filename in os.listdir(img_dir)]
+print ("images without annotations:",set(filesB)-set(filesA))
+```
 
-![](test_set_gif_example.gif)
+- Folder structure:
+object-detection/
+	GP020472_edit_close_img/ (refers to the mp4 file used to extract images from)
+		images.jpg & annotations.xml
+		train/
+			copy of img.jpg and annot.xml used for training
+			test/
+			copy of img.jpg and annot.xml used for testing
+	data/
+	training/
+
+
+In each train & test folders, copy images and annotation xml files.
+
+To use a custom dataset in Tensorflow Object Detection API, you must convert it into the TFRecord file format:
+- Convert XML files to singular CSV files : xml_to_csv.py
+
+
+xml files that can be then converted to the TFRecord files.
+- rectlabel_create_pascal_tf_record.py file to be copied in /Users/pm/Documents/AI/compvision/Object_detection/tfod/models/research/object_detection/dataset_tools
+- copy annotations in images folder (images/annotation/)
+- run : (once for train, once for test)
+$ python3 rectlabel_create_pascal_tf_record.py --images_dir="/Users/pm/Documents/AI/compvision/Object_detection/creating_dataset/GP020472_edit_close_img" --image_list_path="/Users/pm/Documents/AI/compvision/Object_detection/creating_dataset/test.txt" --label_map_path="/Users/pm/Documents/AI/compvision/Object_detection/creating_dataset/label_map.pbtxt" --output_path="/Users/pm/Documents/AI/compvision/Object_detection/creating_dataset/test.record"
+
+source : https://rectlabel.com/help#tf_record
 
 
 ## Part 2 : Training the net
@@ -131,19 +177,13 @@ In the field of computer vision, many pre-trained models are now publicly availa
 
 For now, I chose to go with Single Shot Detector architectures, which are more likely to work on emnbedded devices to run inference at the edge (think Raspberry Pi 3 with limited computing power).
 
+
+### First try : Training the model on Darkflow / YOLO
+
 For compatibility purposes (I prototype on Mac OS X, then train on the cloud), I used this [`fork of Darknet`](https://github.com/thtrieu/darkflow) which is a Tensorflow implementation of Darknet.
 
+Transfer learning reduces the training time and data needed to achieve a custom task. It takes a CNN that has been pre-trained, removes the last fully-connected layer and replaces it with the custom fully-connected layer, treating the original CNN as a feature extractor for the new dataset, and the last fully-connected layer - after training - acts as the classifier for the new dataset.
 
-##### To do
-    1. try Tensorflow Object Detection API (https://github.com/tensorflow/models/tree/master/research/object_detection)
-    2. consider implementing a SSD architecture from scratch in Tensorflow
-	3. Tensorflow Lite
-
-### Training the model
-
-Transfer learning and fine-tuning of the last layers sing data augmentation techniques with Keras ImageDataGenerator.
-
-#### Training the model using Google Colab GPU
 
 ##### Setting up Google Colab
 
@@ -167,17 +207,14 @@ Transfer learning and fine-tuning of the last layers sing data augmentation tech
 2. Assess results
 
 Download the trained weights (in this case, checkpoint files), and run locally the net for inference on the test set.
-After the first 1000 epochs, the model seems to have converged (at least loss was consistently below 0.8). But, the model did not predict any image on the test set. When run on the *train* set, bounding boxes appeared only when the thershold was lowered to 0,1 (at 0,5, maybe half the bounding boxes were showing).
+After several tries (1000 epochs to 8000 epochs), the model seems to have converged (at least loss was consistently below 0.8). But, the model did not predict any image on the test set. When run on the *train* set, bounding boxes appeared only when the thershold was lowered to 0,1 (at 0,5, maybe half the bounding boxes were showing).
 
-3. Train for more epochs
 
-After 1500 epochs, same
+### Second try : Training the model using Tensorflow Object Detection API
 
-##### To do:
-    1.	overfit the network on a very small dataset (a few images) before training on the whole dataset (the overfitting loss can be around or smaller than 0.1 for a one class only network). In the case of disabling noise augmentation, it can very well be near perfect 0.0.
 
-Trained on a small dataset, 3 images, with 4 objects in them of the same class. The model converged after approx. 5000 epochs.
-Saved weights after 8000 epochs in /Users/pm/Documents/AI/compvision/darkflow_master/darkflow/TRAINING/overfit_on_small_data_set/ckpt
+Please refer to Training on Paperspace.md
+
 
 
 ## Part 3 : Running the trained model on a mobile device for in-car inference
@@ -190,3 +227,4 @@ Hardware
 - Raspberry Pi 3
 - Raspberry Pi 3 w/ GPU card
 - iPhone or Android phone
+- Nvidia Jetson
